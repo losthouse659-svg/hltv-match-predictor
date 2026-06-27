@@ -561,60 +561,8 @@ function hideError() {
 
 // Auto-load on page load
 window.addEventListener('DOMContentLoaded', () => {
+    fetchMatches();
+  });
 
   fetchMatches();
 
-  // Create Pick'em card
-function createPickemCard(match) {
-  const card = document.createElement('div');
-  card.className = 'match-card pickem-card';
-  
-  const hltvUrl = `https://www.hltv.org/matches/${match.id || ''}/${match.team1.name.toLowerCase()}-vs-${match.team2.name.toLowerCase()}`;
-  
-  card.innerHTML = `
-    <div class="match-meta">
-      <span class="match-event">${match.event}</span>
-      <span class="match-time">${formatTime(match.time)}</span>
-    </div>
-    
-    <div class="teams-row">
-      <div class="team">
-        <div class="team-name">${match.team1.name}</div>
-      </div>
-      <div class="vs-badge">VS</div>
-      <div class="team">
-        <div class="team-name">${match.team2.name}</div>
-      </div>
-    </div>
-    
-    <div class="pickem-choices">
-      <button class="pickem-btn" data-team="1">${match.team1.name}</button>
-      <button class="pickem-btn" data-team="2">${match.team2.name}</button>
-    </div>
-    
-    <a href="${hltvUrl}" target="_blank" class="hltv-link">
-      🔗 Zobrazit na HLTV
-    </a>
-  `;
-  
-  // Add pick'em logic
-  const buttons = card.querySelectorAll('.pickem-btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      buttons.forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      updatePickemStats();
-    });
-  });
-  
-  return card;
-}
-
-// Update Pick'em stats
-function updatePickemStats() {
-  const total = document.querySelectorAll('.pickem-btn.selected').length;
-  document.getElementById('pickemTotal').textContent = total;
-  // Accuracy would be calculated based on actual results
-}
-});
