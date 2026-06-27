@@ -313,3 +313,131 @@ main {
   padding: 4px 10px;
   border-radius: 6px;
 }
+
+/* Pick'em Challenge Styles */
+.pickem-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pickem-container h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 50%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pickem-info {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 32px;
+}
+
+.pickem-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(123,104,238,0.3);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pickem-matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 24px;
+}
+
+/* Klikatelné match karty */
+.match-card {
+  cursor: pointer;
+  user-select: none;
+}
+
+.match-card.clickable:active {
+  transform: scale(0.98);
+}
+
+.match-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+
+.match-card.expanded .match-details {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hltv-link {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.hltv-link:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(123,104,238,0.5);
+}
+
+/* Vylepšené animace */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123,104,238,0.3); }
+  50% { box-shadow: 0 0 30px rgba(123,104,238,0.6); }
+}
+
+.match-card:hover {
+  animation: glow 2s ease-in-out infinite;
+}
