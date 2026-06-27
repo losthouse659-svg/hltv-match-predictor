@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HLTV Match Predictor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">&#x1F3AF; HLTV Match Predictor</div>
+    <p class="subtitle">Predikce CS2 zapasu na zaklade statistik z HLTV</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="fetchBtn">&#x1F504; Nacist budouci zapasy</button>
+      <div class="filter-bar">
+        <label>Filtr podle eventu:
+          <select id="eventFilter"><option value="">Vsechny</option></select>
+        </label>
+        <label>Razeni:
+          <select id="sortBy">
+            <option value="confidence">Spolehlivost</option>
+            <option value="time">Cas zapasu</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section id="loadingSection" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Nacitam zapasy...</p>
+    </section>
+
+    <section id="matchesContainer" class="matches-grid"></section>
+
+    <div id="errorBox" class="error-box hidden"></div>
+  </main>
+
+  <footer>
+    <p>Data jsou nacitana pres HLTV API proxy &bull; Predikce jsou orientacni</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
