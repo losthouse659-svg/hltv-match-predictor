@@ -562,16 +562,6 @@ function hideError() {
 // Auto-load on page load
 window.addEventListener('DOMContentLoaded', () => {
 
-  // Pick'em tab handling
-if (targetTab === 'pickem') {
-  const pickemMatches = document.getElementById('pickemMatches');
-  pickemMatches.innerHTML = '';
-  
-  filteredMatches.slice(0, 10).forEach(match => {
-    const card = createPickemCard(match);
-    pickemMatches.appendChild(card);
-  });
-}
   fetchMatches();
 
   // Create Pick'em card
