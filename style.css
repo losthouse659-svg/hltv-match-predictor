@@ -260,6 +260,7 @@ main {
 .match-meta {
   display: flex;
   justify-content: space-between;
+    gap: 12px;
   align-items: center;
   font-size: 0.8rem;
   color: var(--text-muted);
