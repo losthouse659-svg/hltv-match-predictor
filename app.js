@@ -235,8 +235,10 @@ function predictMatch(match) {
   };
 }
 
-// Generate mock match data
-function generateMockMatches() {
+// POZNÁMKA: HLTV má anti-scraping ochranu, takže přímé načítání dat nefunguje.
+// Tato funkce generuje demo/mock data pro ukázku fungování prediktoru.
+// Pro produkční použití by bylo potřeba implementovat vlastní backend server,
+// který by scrapoval HLTV nebo použil jejich API (pokud existuje).function generateMockMatches() {
   const teams = [
     { name: 'FaZe Clan', rank: 1, logo: 'https://img-cdn.hltv.org/teamlogo/zBgQY5_2LJkFcQ17AR5W0U.png?ixlib=java-2.1.0&w=100' },
     { name: 'Natus Vincere', rank: 2, logo: 'https://img-cdn.hltv.org/teamlogo/dLRRyUVHDWdHx9SnQZgFZA.svg?ixlib=java-2.1.0' },
