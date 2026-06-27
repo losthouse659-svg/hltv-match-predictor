@@ -429,7 +429,79 @@ function renderBracket() {
 
 // Schedule rendering
 function renderSchedule() {
-  const scheduleView = document.getElementById('scheduleView');
+function renderBracket() {
+  const bracketView = document.getElementById('bracketView');
+  
+  // Ziskej zapasy pro bracket (pouzi filteredMatches nebo vyber nejlepsi zapasy)
+  const bracketMatches = filteredMatches.slice(0, 8); // Top 8 zapasu pro bracket
+  
+  if (bracketMatches.length === 0) {
+    bracketView.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">Zatim nejsou dostupne zadne zapasy pro zobrazeni bracketu. Klikni na "Nacist budouci zapasy".</p>';
+    return;
+  }
+  
+  // Vytvor bracket strukturu (Single Elimination)
+  bracketView.innerHTML = `
+    <div class="bracket-container">
+      <h3 class="bracket-title">🏆 Turnajovy Bracket - Single Elimination</h3>
+      
+      <div class="bracket-rounds">
+        <!-- Quarter Finals -->
+        <div class="bracket-round">
+          <div class="round-title">Ctvrtfinale</div>
+          ${generateBracketMatch(bracketMatches[0], 0)}
+          ${generateBracketMatch(bracketMatches[1], 1)}
+          ${generateBracketMatch(bracketMatches[2], 2)}
+          ${generateBracketMatch(bracketMatches[3], 3)}
+        </div>
+        
+        <!-- Semi Finals -->
+        <div class="bracket-round">
+          <div class="round-title">Semifinale</div>
+          ${generateBracketMatch(bracketMatches[4], 4)}
+          ${generateBracketMatch(bracketMatches[5], 5)}
+        </div>
+        
+        <!-- Finals -->
+        <div class="bracket-round">
+          <div class="round-title">Finale</div>
+          ${generateBracketMatch(bracketMatches[6], 6)}
+        </div>
+        
+        <!-- Winner -->
+        <div class="bracket-round">
+          <div class="round-title">Vitez</div>
+          <div class="bracket-winner">
+            <div class="winner-trophy">🏆</div>
+            <div class="winner-name">${bracketMatches[6]?.prediction.predictedWinner || 'TBD'}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Funkce pro generovani jednoho bracketu match
+function generateBracketMatch(match, index) {
+  if (!match) return '<div class="bracket-match empty"><span>TBD</span></div>';
+  
+  const team1Win = match.prediction.predictedWinner === match.team1.name;
+  
+  return `
+    <div class="bracket-match" data-match-id="${index}">
+      <div class="bracket-team ${team1Win ? 'winner' : ''}">
+        <span class="team-name">${match.team1.name}</span>
+        <span class="team-seed">#${match.team1.rank}</span>
+      </div>
+      <div class="bracket-vs">VS</div>
+      <div class="bracket-team ${!team1Win ? 'winner' : ''}">
+        <span class="team-name">${match.team2.name}</span>
+        <span class="team-seed">#${match.team2.rank}</span>
+      </div>
+      <div class="bracket-event">${match.event}</div>
+    </div>
+  `;
+}
   const sorted = [...allMatches].sort((a, b) => a.time - b.time);
   
   scheduleView.innerHTML = '';
