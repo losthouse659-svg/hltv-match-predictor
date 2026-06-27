@@ -1,6 +1,7 @@
 // Main state
 let allMatches = [];
 let filteredMatches = [];
+let allTeams = [];
 
 // DOM elements
 const fetchBtn = document.getElementById('fetchBtn');
@@ -9,21 +10,41 @@ const loadingSection = document.getElementById('loadingSection');
 const errorBox = document.getElementById('errorBox');
 const eventFilter = document.getElementById('eventFilter');
 const sortBy = document.getElementById('sortBy');
+const teamSearch = document.getElementById('teamSearch');
+
+// Tab handling
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const targetTab = tab.dataset.tab;
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(tc => tc.classList.remove('active'));
+    
+    tab.classList.add('active');
+    document.getElementById(`${targetTab}-tab`).classList.add('active');
+    
+    if (targetTab === 'bracket') renderBracket();
+    if (targetTab === 'schedule') renderSchedule();
+    if (targetTab === 'teams') renderTeams();
+  });
+});
 
 // Event listeners
 fetchBtn.addEventListener('click', fetchMatches);
 eventFilter.addEventListener('change', applyFilters);
 sortBy.addEventListener('change', applyFilters);
+teamSearch?.addEventListener('input', applyFilters);
 
-// Fetch upcoming matches from HLTV API proxy
+// Fetch upcoming matches
 async function fetchMatches() {
   showLoading(true);
   hideError();
   fetchBtn.disabled = true;
 
   try {
-    // Note: HLTV doesn't have official API, using mock data structure
-    // In production, use HLTV API proxy like hltv-api or scraper
     const mockMatches = generateMockMatches();
     
     allMatches = mockMatches.map(match => ({
@@ -41,11 +62,10 @@ async function fetchMatches() {
   }
 }
 
-// Prediction algorithm using various statistics
+// Prediction algorithm
 function predictMatch(match) {
   const { team1, team2 } = match;
   
-  // Weight factors for prediction
   const weights = {
     ranking: 0.30,
     recentForm: 0.25,
@@ -54,42 +74,34 @@ function predictMatch(match) {
     currentStreak: 0.10
   };
 
-  // Calculate individual scores
   let team1Score = 0;
   let team2Score = 0;
 
-  // Ranking score (inverted - lower rank = better)
   if (team1.rank && team2.rank) {
     const rankDiff = team2.rank - team1.rank;
     team1Score += (rankDiff / Math.max(team1.rank, team2.rank)) * weights.ranking;
     team2Score -= (rankDiff / Math.max(team1.rank, team2.rank)) * weights.ranking;
   }
 
-  // Recent form (win rate)
   team1Score += (team1.recentWinRate / 100) * weights.recentForm;
   team2Score += (team2.recentWinRate / 100) * weights.recentForm;
 
-  // Head-to-head record
   if (team1.h2hWins && team2.h2hWins) {
     const h2hTotal = team1.h2hWins + team2.h2hWins;
     team1Score += (team1.h2hWins / h2hTotal) * weights.headToHead;
     team2Score += (team2.h2hWins / h2hTotal) * weights.headToHead;
   }
 
-  // Map pool strength (average map win rate)
   team1Score += (team1.mapPoolStrength / 100) * weights.mapPool;
   team2Score += (team2.mapPoolStrength / 100) * weights.mapPool;
 
-  // Current streak
   team1Score += (team1.currentStreak / 10) * weights.currentStreak;
   team2Score += (team2.currentStreak / 10) * weights.currentStreak;
 
-  // Normalize to percentages
   const total = team1Score + team2Score;
   const team1WinProb = Math.round((team1Score / total) * 100);
   const team2WinProb = 100 - team1WinProb;
 
-  // Calculate confidence level
   const probDiff = Math.abs(team1WinProb - team2WinProb);
   let confidence;
   if (probDiff > 30) confidence = 'high';
@@ -108,19 +120,19 @@ function predictMatch(match) {
 // Generate mock match data
 function generateMockMatches() {
   const teams = [
-    { name: 'FaZe Clan', rank: 1, logo: 'https://img-cdn.hltv.org/teamlogo/zBgQY5_2LJkFcQ17AR5W0U.png?ixlib=java-2.1.0&w=100&s=90ac4e9d2cdaf7aa87e0d47c0bacc1ec' },
-    { name: 'Natus Vincere', rank: 2, logo: 'https://img-cdn.hltv.org/teamlogo/dLRRyUVHDWdHx9SnQZgFZA.svg?ixlib=java-2.1.0&s=5e54d22b75e40a26c6e1ba8f143f04b5' },
-    { name: 'Vitality', rank: 3, logo: 'https://img-cdn.hltv.org/teamlogo/pW64FSj0w2M0bBfJb8uS8v.svg?ixlib=java-2.1.0&s=c4e8cc7e7e7e7e7e7e7e7e7e7e7e7e7e' },
-    { name: 'G2 Esports', rank: 4, logo: 'https://img-cdn.hltv.org/teamlogo/FurxP8yOQlxTSZBYEnjPF6.svg?ixlib=java-2.1.0&s=44e8c4b8e6cf8c8c8c8c8c8c8c8c8c8c' },
-    { name: 'Spirit', rank: 5, logo: 'https://img-cdn.hltv.org/teamlogo/9iyqyqVN2_3u2vU9XPKyKA.png?ixlib=java-2.1.0&w=100&s=1e0fe0e0e0e0e0e0e0e0e0e0e0e0e0e0' },
-    { name: 'MOUZ', rank: 6, logo: 'https://img-cdn.hltv.org/teamlogo/3H-TkC4CJCbITJvs1cLQ_h.svg?ixlib=java-2.1.0&s=5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e' },
-    { name: 'Complexity', rank: 9, logo: 'https://img-cdn.hltv.org/teamlogo/7yLF3HeO20L_PGI7AjCMuj.svg?ixlib=java-2.1.0&s=6e6e6e6e6e6e6e6e6e6e6e6e6e6e6e6e' },
-    { name: 'ENCE', rank: 11, logo: 'https://img-cdn.hltv.org/teamlogo/c_a1hmYx8yULPX_5p2_OhP.svg?ixlib=java-2.1.0&s=7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e' }
+    { name: 'FaZe Clan', rank: 1, logo: 'https://img-cdn.hltv.org/teamlogo/zBgQY5_2LJkFcQ17AR5W0U.png?ixlib=java-2.1.0&w=100' },
+    { name: 'Natus Vincere', rank: 2, logo: 'https://img-cdn.hltv.org/teamlogo/dLRRyUVHDWdHx9SnQZgFZA.svg?ixlib=java-2.1.0' },
+    { name: 'Vitality', rank: 3, logo: 'https://img-cdn.hltv.org/teamlogo/pW64FSj0w2M0bBfJb8uS8v.svg?ixlib=java-2.1.0' },
+    { name: 'G2 Esports', rank: 4, logo: 'https://img-cdn.hltv.org/teamlogo/FurxP8yOQlxTSZBYEnjPF6.svg?ixlib=java-2.1.0' },
+    { name: 'Spirit', rank: 5, logo: 'https://img-cdn.hltv.org/teamlogo/9iyqyqVN2_3u2vU9XPKyKA.png?ixlib=java-2.1.0&w=100' },
+    { name: 'MOUZ', rank: 6, logo: 'https://img-cdn.hltv.org/teamlogo/3H-TkC4CJCbITJvs1cLQ_h.svg?ixlib=java-2.1.0' },
+    { name: 'Complexity', rank: 9, logo: 'https://img-cdn.hltv.org/teamlogo/7yLF3HeO20L_PGI7AjCMuj.svg?ixlib=java-2.1.0' },
+    { name: 'ENCE', rank: 11, logo: 'https://img-cdn.hltv.org/teamlogo/c_a1hmYx8yULPX_5p2_OhP.svg?ixlib=java-2.1.0' }
   ];
 
-  const events = ['IEM Katowice', 'BLAST Premier', 'ESL Pro League', 'PGL Major'];
-  const maps = ['Mirage', 'Dust2', 'Inferno', 'Nuke', 'Ancient', 'Overpass', 'Anubis'];
+  allTeams = teams;
 
+  const events = ['IEM Katowice', 'BLAST Premier', 'ESL Pro League', 'PGL Major'];
   const matches = [];
   const now = Date.now();
 
@@ -163,13 +175,19 @@ function generateMockMatches() {
 function applyFilters() {
   let matches = [...allMatches];
 
-  // Event filter
   const selectedEvent = eventFilter.value;
   if (selectedEvent) {
     matches = matches.filter(m => m.event === selectedEvent);
   }
 
-  // Sorting
+  const searchTerm = teamSearch?.value.toLowerCase() || '';
+  if (searchTerm) {
+    matches = matches.filter(m => 
+      m.team1.name.toLowerCase().includes(searchTerm) ||
+      m.team2.name.toLowerCase().includes(searchTerm)
+    );
+  }
+
   const sortMode = sortBy.value;
   if (sortMode === 'confidence') {
     matches.sort((a, b) => b.prediction.confidenceScore - a.prediction.confidenceScore);
@@ -181,7 +199,6 @@ function applyFilters() {
   renderMatches();
 }
 
-// Populate event filter dropdown
 function populateEventFilter() {
   const events = [...new Set(allMatches.map(m => m.event))];
   eventFilter.innerHTML = '<option value="">Vsechny</option>';
@@ -193,12 +210,11 @@ function populateEventFilter() {
   });
 }
 
-// Render matches to DOM
 function renderMatches() {
   matchesContainer.innerHTML = '';
 
   if (filteredMatches.length === 0) {
-    matchesContainer.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px;">Zadne zapasy nenalezeny</p>';
+    matchesContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">Zadne zapasy nenalezeny</p>';
     return;
   }
 
@@ -208,7 +224,6 @@ function renderMatches() {
   });
 }
 
-// Create match card element
 function createMatchCard(match) {
   const { team1, team2, event, format, time, prediction } = match;
 
@@ -217,16 +232,16 @@ function createMatchCard(match) {
 
   const confClass = `conf-${prediction.confidence}`;
   const confText = {
-    high: 'Vysoka',
-    mid: 'Stredni',
-    low: 'Nizka'
+    high: 'VYSOKA',
+    mid: 'STREDNI',
+    low: 'NIZKA'
   }[prediction.confidence];
 
   card.innerHTML = `
     <div class="confidence-badge ${confClass}">${confText}</div>
     <div class="match-meta">
       <span class="match-event">${event}</span>
-      <span>${format} &bull; ${formatTime(time)}</span>
+      <span class="match-time">${formatTime(time)}</span>
     </div>
     <div class="teams-row">
       <div class="team">
@@ -281,11 +296,52 @@ function createMatchCard(match) {
       </div>
     </div>
     <div class="winner-badge">
-      Predikce: ${prediction.predictedWinner} &#x1F3C6;
+      &#x1F3C6; Predikce: ${prediction.predictedWinner}
     </div>
   `;
 
   return card;
+}
+
+// Bracket rendering
+function renderBracket() {
+  const bracketView = document.getElementById('bracketView');
+  bracketView.innerHTML = '<p>Bracket vizualizace bude pridana brzy. Pracuje se na grafickem zobrazeni turnajoveho pavouka.</p>';
+}
+
+// Schedule rendering
+function renderSchedule() {
+  const scheduleView = document.getElementById('scheduleView');
+  const sorted = [...allMatches].sort((a, b) => a.time - b.time);
+  
+  scheduleView.innerHTML = '';
+  sorted.forEach(match => {
+    const item = document.createElement('div');
+    item.className = 'schedule-item';
+    item.innerHTML = `
+      <div class="schedule-time">${formatTime(match.time)}</div>
+      <div class="schedule-teams">${match.team1.name} vs ${match.team2.name}</div>
+      <div class="schedule-event">${match.event} - ${match.format}</div>
+    `;
+    scheduleView.appendChild(item);
+  });
+}
+
+// Teams rendering
+function renderTeams() {
+  const teamsGrid = document.getElementById('teamsGrid');
+  
+  teamsGrid.innerHTML = '';
+  allTeams.forEach(team => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.innerHTML = `
+      <img src="${team.logo}" alt="${team.name}" onerror="this.style.display='none'">
+      <h3>${team.name}</h3>
+      <div class="team-rank">Rank #${team.rank}</div>
+    `;
+    teamsGrid.appendChild(card);
+  });
 }
 
 // Helper functions
