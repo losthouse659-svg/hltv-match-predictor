@@ -16,6 +16,7 @@
       <button class="tab" data-tab="bracket">&#x1F3C6; Bracket</button>
       <button class="tab" data-tab="schedule">&#x1F4C5; Rozvrh</button>
       <button class="tab" data-tab="teams">&#x1F465; Tymy</button>
+            <button class="tab" data-tab="pickem">🎯&#x1F3AF; Pick'em</button>
     </nav>
   </header>
 
@@ -78,6 +79,33 @@
     <!-- Tymy Tab -->
     <section id="teams-tab" class="tab-content">
       <div class="teams-container">
+
+            <!-- Pick'em Tab -->
+    <section id="pickem-tab" class="tab-content">
+      <div class="pickem-container">
+        <h2>🎯 Pick'em Challenge</h2>
+        <p class="pickem-info">Vyberte vítěze zápasů a sledujte svou úspěšnost!</p>
+        
+        <div class="pickem-stats">
+          <div class="stat-card">
+            <div class="stat-number" id="pickemCorrect">0</div>
+            <div class="stat-label">Správné</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="pickemTotal">0</div>
+            <div class="stat-label">Celkem</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="pickemAccuracy">0%</div>
+            <div class="stat-label">Přesnost</div>
+          </div>
+        </div>
+        
+        <div id="pickemMatches" class="pickem-matches">
+          <!-- Zápasy pro pick'em budou vykresleny JavaScriptem -->
+        </div>
+      </div>
+    </section>
         <h2>&#x1F465; Databaze Tymu</h2>
         
         <div class="team-filters">
